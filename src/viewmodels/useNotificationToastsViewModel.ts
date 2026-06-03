@@ -24,7 +24,9 @@ export function useNotificationToastsViewModel() {
       (notifications) => {
         const hasNewPromotion = notifications.some(
           (notification) =>
-            !knownNotificationIds.current.has(notification.id) && notification.message.startsWith('notification.promoted'),
+            !knownNotificationIds.current.has(notification.id) &&
+            typeof notification.message === 'string' &&
+            notification.message.startsWith('notification.promoted'),
         );
 
         if (hasLoadedNotifications.current && hasNewPromotion) {

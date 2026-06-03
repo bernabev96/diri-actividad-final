@@ -47,10 +47,12 @@ export async function searchUsersByEmail(email: string): Promise<AppUser[]> {
 }
 
 export async function searchUsers(term: string): Promise<AppUser[]> {
-  const normalizedTerm = term.trim().toLowerCase();
+  const normalizedTerm = typeof term === 'string' ? term.trim().toLowerCase() : '';
   const users = await getAllUsers();
 
   return users.filter(
-    (user) => user.email.toLowerCase().includes(normalizedTerm) || user.name.toLowerCase().includes(normalizedTerm),
+    (user) =>
+      String(user.email ?? '').toLowerCase().includes(normalizedTerm) ||
+      String(user.name ?? '').toLowerCase().includes(normalizedTerm),
   );
 }

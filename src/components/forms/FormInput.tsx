@@ -13,10 +13,10 @@ export function FormInput({ error, label, registration, ...props }: FormInputPro
   const errorMessage = error?.message ? intl.formatMessage({ id: error.message }) : null;
 
   return (
-    <label className="block">
+    <label className="block min-w-0">
       <span className="text-sm font-medium text-slate-700">{label}</span>
       <input
-        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-violet-600 focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+        className="mt-1 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-violet-600 focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-100"
         aria-invalid={Boolean(error)}
         {...registration}
         {...props}

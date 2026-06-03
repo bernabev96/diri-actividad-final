@@ -10,13 +10,38 @@ import { getPageCount, getPageItems } from '../../utils/pagination';
 import { profileSchema, type ProfileFormValues } from '../../utils/validators';
 import { useProfileViewModel } from '../../viewmodels/useProfileViewModel';
 
-function getNotificationMessage(notificationMessage: string) {
+const validNotificationMessageIds = new Set([
+  'notification.promoted',
+  'notification.promotedWithClass',
+  'notification.waitlistJoined',
+  'notification.waitlistJoinedWithClass',
+  'notification.waitlistLeft',
+  'notification.waitlistLeftWithClass',
+]);
+
+function getNotificationMessage(notificationMessage: unknown) {
+  if (typeof notificationMessage !== 'string') {
+    return {
+      classTitle: undefined,
+      messageId: 'notifications.unknown',
+    };
+  }
+
   const [messageId, classTitle] = notificationMessage.split('|');
 
   return {
     classTitle,
-    messageId,
+    messageId: validNotificationMessageIds.has(messageId) ? messageId : 'notifications.unknown',
   };
+}
+
+function getNotificationDate(createdAt: unknown) {
+  if (typeof createdAt !== 'string') {
+    return null;
+  }
+
+  const date = new Date(createdAt);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 const notificationsPageSize = 5;
@@ -39,7 +64,9 @@ export default function ProfilePage() {
   const [notificationsPage, setNotificationsPage] = useState(1);
   const notificationsPageCount = getPageCount(notifications.length, notificationsPageSize);
   const paginatedNotifications = getPageItems(notifications, notificationsPage, notificationsPageSize);
-  const userInitials = user?.name
+  const userName = typeof user?.name === 'string' ? user.name : '';
+  const userEmail = typeof user?.email === 'string' ? user.email : '';
+  const userInitials = userName
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
@@ -74,8 +101,8 @@ export default function ProfilePage() {
             <p className="text-sm font-black uppercase tracking-wider text-violet-700">
               <FormattedMessage id="profile.title" />
             </p>
-            <h1 className="mt-1 text-3xl font-black text-slate-950">{user?.name}</h1>
-            <p className="mt-1 text-sm text-slate-600">{user?.email}</p>
+            <h1 className="mt-1 text-3xl font-black text-slate-950">{userName}</h1>
+            <p className="mt-1 text-sm text-slate-600">{userEmail}</p>
           </div>
         </div>
       </div>
@@ -104,7 +131,7 @@ export default function ProfilePage() {
                 <FormattedMessage id="profile.success" />
               </p>
             ) : null}
-            <button className="rounded-xl bg-violet-700 px-4 py-3 font-bold text-white shadow-sm shadow-violet-200 transition hover:bg-violet-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 disabled:bg-slate-300" disabled={isLoading} type="submit">
+            <button className="rounded-xl bg-violet-700 px-4 py-3 font-bold text-white shadow-sm shadow-violet-200 transition hover:bg-violet-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 disabled:bg-slate-300" disabled={isLoading} type="submit">
               <FormattedMessage id={isLoading ? 'auth.loading' : 'profile.submit'} />
             </button>
           </form>
@@ -116,7 +143,7 @@ export default function ProfilePage() {
               <FormattedMessage id="profile.security.title" />
             </h2>
             <button
-              className="mt-5 rounded-xl bg-violet-700 px-4 py-3 font-bold text-white shadow-sm shadow-violet-200 transition hover:bg-violet-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+              className="mt-5 rounded-xl bg-violet-700 px-4 py-3 font-bold text-white shadow-sm shadow-violet-200 transition hover:bg-violet-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
               onClick={requestPasswordReset}
               type="button"
             >
@@ -152,32 +179,39 @@ export default function ProfilePage() {
               </p>
             ) : (
               <ul className="mt-4 space-y-3">
-                {paginatedNotifications.map((notification) => (
-                  <li className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800" key={notification.id}>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span>
-                        <FormattedMessage
-                          id={getNotificationMessage(notification.message).messageId}
-                          values={{ classTitle: getNotificationMessage(notification.message).classTitle }}
-                        />
-                      </span>
-                      <span className="rounded-full bg-white/80 px-2 py-1 text-xs font-bold text-emerald-900">
-                        <FormattedMessage id={notification.read ? 'notifications.read' : 'notifications.unread'} />
-                      </span>
-                    </div>
-                    <time className="mt-2 block text-xs text-emerald-700" dateTime={notification.createdAt}>
-                      {intl.formatDate(new Date(notification.createdAt), {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })}{' '}
-                      {intl.formatTime(new Date(notification.createdAt), {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </time>
-                  </li>
-                ))}
+                {paginatedNotifications.map((notification) => {
+                  const notificationMessage = getNotificationMessage(notification.message);
+                  const notificationDate = getNotificationDate(notification.createdAt);
+
+                  return (
+                    <li className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800" key={notification.id}>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span>
+                          <FormattedMessage
+                            id={notificationMessage.messageId}
+                            values={{ classTitle: notificationMessage.classTitle }}
+                          />
+                        </span>
+                        <span className="rounded-full bg-white/80 px-2 py-1 text-xs font-bold text-emerald-900">
+                          <FormattedMessage id={notification.read ? 'notifications.read' : 'notifications.unread'} />
+                        </span>
+                      </div>
+                      {notificationDate ? (
+                        <time className="mt-2 block text-xs text-emerald-700" dateTime={notification.createdAt}>
+                          {intl.formatDate(notificationDate, {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })}{' '}
+                          {intl.formatTime(notificationDate, {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </time>
+                      ) : null}
+                    </li>
+                  );
+                })}
               </ul>
             )}
             <Pagination currentPage={notificationsPage} onPageChange={setNotificationsPage} pageCount={notificationsPageCount} />

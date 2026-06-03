@@ -93,6 +93,7 @@
   "notifications.read": "Read",
   "notifications.unread": "New",
   "notifications.toastNew": "You have a new notification.",
+  "notifications.unknown": "The details of this notification could not be shown.",
   "toast.reservation.reserved": "Booking confirmed successfully.",
   "toast.reservation.waitlist": "The class is full. You joined the waitlist.",
   "toast.reservation.cancelled": "Booking cancelled successfully.",

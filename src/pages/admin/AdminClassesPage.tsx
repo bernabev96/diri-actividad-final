@@ -190,15 +190,15 @@ export default function AdminClassesPage() {
 
       <Dialog className="relative z-50" onClose={setIsModalOpen} open={isModalOpen}>
         <div className="fixed inset-0 bg-slate-950/50" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-4">
+          <DialogPanel className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto overflow-x-hidden rounded-3xl bg-white p-5 shadow-xl sm:p-6">
             <DialogTitle className="text-xl font-black text-slate-950">
               <FormattedMessage id={selectedClass ? 'admin.classes.edit' : 'admin.classes.create'} />
             </DialogTitle>
             <form className="mt-6 space-y-4" onSubmit={handleSubmit(submit)}>
               <FormInput error={errors.title} label={intl.formatMessage({ id: 'class.title' })} registration={register('title')} type="text" />
               <FormInput error={errors.trainer} label={intl.formatMessage({ id: 'class.trainer' })} registration={register('trainer')} type="text" />
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
                 <FormInput error={errors.date} label={intl.formatMessage({ id: 'class.date' })} min={getTodayDateValue()} registration={register('date')} type="date" />
                 <FormInput error={errors.time} label={intl.formatMessage({ id: 'class.time' })} registration={register('time')} type="time" />
               </div>
@@ -207,7 +207,7 @@ export default function AdminClassesPage() {
                 <input className="h-4 w-4 rounded border-slate-300" type="checkbox" {...register('active')} />
                 <FormattedMessage id="class.active" />
               </label>
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex flex-wrap justify-end gap-2 pt-2">
                 <button className="rounded-xl border border-slate-300 px-4 py-2 font-bold text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500" onClick={() => setIsModalOpen(false)} type="button">
                   <FormattedMessage id="admin.classes.close" />
                 </button>

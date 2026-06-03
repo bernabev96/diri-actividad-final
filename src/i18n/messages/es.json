@@ -93,6 +93,7 @@
   "notifications.read": "Leída",
   "notifications.unread": "Nueva",
   "notifications.toastNew": "Tienes una nueva notificación.",
+  "notifications.unknown": "No se ha podido mostrar el detalle de esta notificación.",
   "toast.reservation.reserved": "Reserva confirmada correctamente.",
   "toast.reservation.waitlist": "La clase está completa. Has entrado en la lista de espera.",
   "toast.reservation.cancelled": "Reserva cancelada correctamente.",
